@@ -4,10 +4,6 @@
 
 <h2>Административная панель</h2>
 
-<!-- ===================== -->
-<!-- ДОБАВЛЕНИЕ СТАТЬИ -->
-<!-- ===================== -->
-
 <div class="card">
     <h3>Добавить статью</h3>
 
@@ -19,10 +15,6 @@
     </form>
 </div>
 
-<!-- ===================== -->
-<!-- ДОБАВЛЕНИЕ НОВОСТИ -->
-<!-- ===================== -->
-
 <div class="card">
     <h3>Добавить новость</h3>
 
@@ -32,10 +24,6 @@
         <input type="submit" value="Добавить новость">
     </form>
 </div>
-
-<!-- ===================== -->
-<!-- ПОЛЬЗОВАТЕЛИ -->
-<!-- ===================== -->
 
 <div class="card">
     <h3>Пользователи сайта</h3>
@@ -53,9 +41,9 @@
             <td>{{ u.role }}</td>
             <td>
                 {% if u.username != "admin" %}
-                <a href="{{ url_for('admin_bp.delete_user', user_id=u.id) }}">
-                    Удалить
-                </a>
+                    <a href="{{ url_for('admin.delete_user', user_id=u.id) }}">
+                        Удалить
+                    </a>
                 {% endif %}
             </td>
         </tr>
@@ -63,14 +51,10 @@
     </table>
 </div>
 
-<!-- ===================== -->
-<!-- СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ -->
-<!-- ===================== -->
-
 <div class="card">
     <h3>Создать пользователя</h3>
 
-    <form method="post" action="{{ url_for('admin_bp.create_user') }}">
+    <form method="post" action="{{ url_for('admin.create_user') }}">
         <input type="text" name="username" placeholder="Логин" required>
         <input type="password" name="password" placeholder="Пароль" required>
         <select name="role">

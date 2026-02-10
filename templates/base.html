@@ -21,8 +21,7 @@
                 <li><a href="{{ url_for('production') }}">Производство</a></li>
                 <li><a href="{{ url_for('news') }}">Новости</a></li>
                 <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
-                <a href="{{ url_for('sitemap') }}">Карта сайта</a>
-
+                <li><a href="{{ url_for('sitemap') }}">Карта сайта</a></li>
 
                 {% if current_user %}
                     <li><a href="{{ url_for('profile') }}">Личный кабинет</a></li>
@@ -32,16 +31,15 @@
                 {% endif %}
 
                 {% if current_user and current_user.is_admin() %}
-                    <li><a href="{{ url_for('admin_bp.admin_panel') }}">Админ-панель</a></li>
+                    <li><a href="{{ url_for('admin.admin_panel') }}">Админ-панель</a></li>
                 {% endif %}
             </ul>
         </nav>
 
-        <button onclick="toggleTheme()">Версия для слабовидящих</button>
+        <button type="button" onclick="toggleTheme()">Версия для слабовидящих</button>
     </div>
 </header>
 
-<!-- БАННЕР СТРОГО ЗДЕСЬ -->
 {% block banner %}{% endblock %}
 
 <main>
