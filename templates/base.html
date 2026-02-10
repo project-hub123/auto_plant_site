@@ -5,47 +5,41 @@
     <title>Автомобильный завод</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link id="theme-style" rel="stylesheet" href="{{ url_for('static', filename='css/style_default.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_default.css') }}">
     <script src="{{ url_for('static', filename='js/theme_switcher.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/search.js') }}" defer></script>
 </head>
 <body>
 
 <header>
-    <h1>Автомобильный завод</h1>
+    <div class="container">
+        <h1>Автомобильный завод</h1>
 
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('index') }}">Главная</a></li>
-            <li><a href="{{ url_for('about') }}">О заводе</a></li>
-            <li><a href="{{ url_for('production') }}">Производство</a></li>
-            <li><a href="{{ url_for('news') }}">Новости</a></li>
-            <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Главная</a></li>
+                <li><a href="{{ url_for('about') }}">О заводе</a></li>
+                <li><a href="{{ url_for('production') }}">Производство</a></li>
+                <li><a href="{{ url_for('news') }}">Новости</a></li>
+                <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
 
-            {% if current_user %}
-                <li><a href="{{ url_for('profile') }}">Личный кабинет</a></li>
-                <li><a href="{{ url_for('auth.logout') }}">Выход</a></li>
-            {% else %}
-                <li><a href="{{ url_for('auth.login') }}">Вход</a></li>
-            {% endif %}
+                {% if current_user %}
+                    <li><a href="{{ url_for('profile') }}">Личный кабинет</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">Выход</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}">Вход</a></li>
+                {% endif %}
 
-            {% if current_user and current_user.is_admin() %}
-                <li><a href="{{ url_for('admin_bp.admin_panel') }}">Админ-панель</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+                {% if current_user and current_user.is_admin() %}
+                    <li><a href="{{ url_for('admin_bp.admin_panel') }}">Админ-панель</a></li>
+                {% endif %}
+            </ul>
+        </nav>
 
-    <form class="search-box" action="{{ url_for('search') }}" method="get">
-        <input type="text" name="q" placeholder="Поиск по сайту">
-        <input type="submit" value="Найти">
-    </form>
-
-    <button type="button" onclick="toggleTheme()">
-        Версия для слабовидящих
-    </button>
+        <button onclick="toggleTheme()">Версия для слабовидящих</button>
+    </div>
 </header>
 
-<!-- БАННЕР  -->
+<!-- БАННЕР СТРОГО ЗДЕСЬ -->
 {% block banner %}{% endblock %}
 
 <main>
