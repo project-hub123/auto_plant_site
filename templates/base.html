@@ -2,90 +2,65 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title if title else "Автомобильный завод" }}</title>
+    <title>Автомобильный завод</title>
 
-    <!-- Адаптивность -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Основной стиль (переключается через JS) -->
-    <link id="theme-style" rel="stylesheet" href="/static/css/style_default.css">
+    <link id="theme-style" rel="stylesheet" href="{{ url_for('static', filename='css/style_default.css') }}">
 
-    <!-- Скрипты -->
-    <script src="/static/js/theme_switcher.js" defer></script>
-    <script src="/static/js/search.js" defer></script>
+    <script src="{{ url_for('static', filename='js/theme_switcher.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}" defer></script>
 </head>
 <body>
 
-    <!-- ===============================
-         ШАПКА САЙТА
-    ================================ -->
+<header>
+    <h1>Автомобильный завод</h1>
 
-    <header>
-        <h1>Автомобильный завод</h1>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Главная</a></li>
+            <li><a href="{{ url_for('about') }}">О заводе</a></li>
+            <li><a href="{{ url_for('production') }}">Производство</a></li>
+            <li><a href="{{ url_for('news') }}">Новости</a></li>
+            <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
 
-        <!-- Навигация -->
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('index') }}">Главная</a></li>
-                <li><a href="{{ url_for('about') }}">О заводе</a></li>
-                <li><a href="{{ url_for('production') }}">Производство</a></li>
-                <li><a href="{{ url_for('news') }}">Новости</a></li>
-                <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
+            {% if current_user %}
+                <li><a href="{{ url_for('profile') }}">Личный кабинет</a></li>
+                <li><a href="{{ url_for('auth.logout') }}">Выход</a></li>
+            {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Вход</a></li>
+                <li><a href="{{ url_for('auth.register') }}">Регистрация</a></li>
+            {% endif %}
 
-                {% if session.get("user_id") %}
-                    <li><a href="{{ url_for('profile') }}">Личный кабинет</a></li>
-                    <li><a href="{{ url_for('logout') }}">Выход</a></li>
-                {% else %}
-                    <li><a href="{{ url_for('login') }}">Вход</a></li>
-                    <li><a href="{{ url_for('register') }}">Регистрация</a></li>
-                {% endif %}
+            {% if current_user and current_user.is_admin() %}
+                <li><a href="{{ url_for('admin_bp.admin_panel') }}">Админ-панель</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 
-                {% if session.get("user_id") and current_user.role == "admin" %}
-                    <li><a href="{{ url_for('admin') }}">Админ-панель</a></li>
-                {% endif %}
-            </ul>
-        </nav>
+    <form id="search-form" action="{{ url_for('search') }}" method="get" class="search-box">
+        <input
+            id="search-input"
+            type="text"
+            name="q"
+            placeholder="Поиск по сайту"
+        >
+        <input type="submit" value="Найти">
+    </form>
 
-        <!-- Поиск -->
-        <form id="search-form" action="{{ url_for('search') }}" method="get" class="search-box">
-            <input
-                id="search-input"
-                type="text"
-                name="q"
-                placeholder="Поиск по сайту"
-                value="{{ request.args.get('q', '') }}"
-            >
-            <input type="submit" value="Найти">
-        </form>
+    <button type="button" onclick="toggleTheme()">
+        Версия для слабовидящих
+    </button>
+</header>
 
-        <!-- Переключение версии для слабовидящих -->
-        <button type="button" onclick="toggleTheme()">
-            Версия для слабовидящих
-        </button>
-    </header>
+<main>
+    {% block content %}{% endblock %}
+</main>
 
-    <!-- ===============================
-         ОСНОВНОЙ КОНТЕНТ
-    ================================ -->
-
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-
-    <!-- ===============================
-         ПОДВАЛ
-    ================================ -->
-
-    <footer>
-        <p>
-            © {{ 2026 }} Автомобильный завод<br>
-            Официальный корпоративный сайт
-        </p>
-        <p>
-            <a href="{{ url_for('sitemap') }}">Карта сайта</a>
-        </p>
-    </footer>
+<footer>
+    <p>© 2026 Автомобильный завод</p>
+    <p><a href="{{ url_for('sitemap') }}">Карта сайта</a></p>
+</footer>
 
 </body>
 </html>

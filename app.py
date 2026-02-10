@@ -18,22 +18,25 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
-# ----------------- импорт моделей -----------------
+# -------------------------------------------------
+# ИМПОРТ МОДЕЛЕЙ
+# -------------------------------------------------
 
 from models.user import User
 from models.article import Article
 from models.news import News
 from models.message import Message
 
-# ----------------- сервисы -----------------
+# -------------------------------------------------
+# ИМПОРТ СЕРВИСОВ
+# -------------------------------------------------
 
 from services.search import search_content
-from services.access_control import (
-    get_current_user,
-    login_required
-)
+from services.access_control import get_current_user, login_required
 
-# ----------------- blueprints -----------------
+# -------------------------------------------------
+# ИМПОРТ BLUEPRINTS
+# -------------------------------------------------
 
 from blueprints.auth import auth_bp
 from blueprints.admin import admin_bp
@@ -41,15 +44,18 @@ from blueprints.admin import admin_bp
 app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 
-# ----------------- контекст -----------------
+# -------------------------------------------------
+# КОНТЕКСТ ДЛЯ ШАБЛОНОВ
+# -------------------------------------------------
 
 @app.context_processor
 def inject_user():
     return dict(current_user=get_current_user())
 
-# ----------------- БД -----------------
+# -------------------------------------------------
+# ИНИЦИАЛИЗАЦИЯ БД (FLASK 3.x)
+# -------------------------------------------------
 
-@app.before_first_request
 def init_db():
     os.makedirs("database", exist_ok=True)
     db.create_all()
@@ -63,7 +69,13 @@ def init_db():
         db.session.add(admin)
         db.session.commit()
 
-# ----------------- маршруты -----------------
+
+with app.app_context():
+    init_db()
+
+# -------------------------------------------------
+# МАРШРУТЫ
+# -------------------------------------------------
 
 @app.route("/")
 def index():
@@ -145,6 +157,10 @@ def sitemap():
 def not_found(e):
     return render_template("404.html"), 404
 
+
+# -------------------------------------------------
+# ЗАПУСК
+# -------------------------------------------------
 
 if __name__ == "__main__":
     app.run(debug=True)
