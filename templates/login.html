@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Вход в систему</h2>
+
+<p>
+Для доступа к личному кабинету и дополнительным возможностям сайта
+необходимо выполнить вход, используя логин и пароль.
+</p>
+
+{% if error %}
+    <p class="error">
+        {{ error }}
+    </p>
+{% endif %}
+
+<div class="card">
+    <form method="post" action="{{ url_for('login') }}">
+        <label for="username">Логин</label>
+        <input
+            type="text"
+            id="username"
+            name="username"
+            required
+        >
+
+        <label for="password">Пароль</label>
+        <input
+            type="password"
+            id="password"
+            name="password"
+            required
+        >
+
+        <input type="submit" value="Войти">
+    </form>
+</div>
+
+<p>
+Если у вас ещё нет учётной записи, вы можете
+<a href="{{ url_for('register') }}">зарегистрироваться</a>.
+</p>
+
+{% endblock %}
