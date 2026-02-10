@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Регистрация пользователя</h2>
+
+<p>
+Регистрация позволяет создать личную учётную запись на сайте
+автомобильного завода и получить доступ к персональным возможностям.
+</p>
+
+{% if error %}
+    <p class="error">
+        {{ error }}
+    </p>
+{% endif %}
+
+<div class="card">
+    <form method="post" action="{{ url_for('register') }}">
+        <label for="username">Логин</label>
+        <input
+            type="text"
+            id="username"
+            name="username"
+            required
+        >
+
+        <label for="password">Пароль</label>
+        <input
+            type="password"
+            id="password"
+            name="password"
+            required
+        >
+
+        <input type="submit" value="Зарегистрироваться">
+    </form>
+</div>
+
+<p>
+Если у вас уже есть учётная запись, вы можете
+<a href="{{ url_for('login') }}">войти в систему</a>.
+</p>
+
+{% endblock %}
