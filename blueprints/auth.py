@@ -9,16 +9,12 @@ from flask import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app import db
-from app import User
+from extensions import db
+from models.user import User
 
 
 auth_bp = Blueprint("auth", __name__)
 
-
-# -------------------------------------------------
-# ВХОД В СИСТЕМУ
-# -------------------------------------------------
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -39,10 +35,6 @@ def login():
     return render_template("login.html", error=error)
 
 
-# -------------------------------------------------
-# РЕГИСТРАЦИЯ ПОЛЬЗОВАТЕЛЯ
-# -------------------------------------------------
-
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     error = None
@@ -54,21 +46,17 @@ def register():
         if User.query.filter_by(username=username).first():
             error = "Пользователь с таким логином уже существует"
         else:
-            new_user = User(
+            user = User(
                 username=username,
                 password_hash=generate_password_hash(password),
                 role="user"
             )
-            db.session.add(new_user)
+            db.session.add(user)
             db.session.commit()
             return redirect(url_for("auth.login"))
 
     return render_template("register.html", error=error)
 
-
-# -------------------------------------------------
-# ВЫХОД ИЗ СИСТЕМЫ
-# -------------------------------------------------
 
 @auth_bp.route("/logout")
 def logout():
