@@ -2,13 +2,16 @@
 # Модель статьи
 # Проект: "Автомобильный завод"
 
-from app import db
+from extensions import db
 
 
 class Article(db.Model):
     __tablename__ = "articles"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     title = db.Column(
         db.String(200),

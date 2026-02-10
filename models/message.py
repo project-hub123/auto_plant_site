@@ -2,7 +2,7 @@
 # Модель сообщения обратной связи
 # Проект: "Автомобильный завод"
 
-from app import db
+from extensions import db
 
 
 class Message(db.Model):

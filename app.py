@@ -1,16 +1,11 @@
 # app.py
 # Корпоративный сайт "Автомобильный завод"
-# Практика: разработка веб-сайта без CMS
-# Стек: Python + Flask
 
 import os
 from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 
-# -------------------------------------------------
-# ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
-# -------------------------------------------------
+from extensions import db
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -21,31 +16,24 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
-# -------------------------------------------------
-# ИМПОРТ МОДЕЛЕЙ
-# -------------------------------------------------
+# ----------------- импорт моделей -----------------
 
 from models.user import User
 from models.article import Article
 from models.news import News
 from models.message import Message
 
-# -------------------------------------------------
-# ИМПОРТ СЕРВИСОВ
-# -------------------------------------------------
+# ----------------- сервисы -----------------
 
 from services.search import search_content
 from services.access_control import (
     get_current_user,
-    login_required,
-    admin_required
+    login_required
 )
 
-# -------------------------------------------------
-# ИМПОРТ BLUEPRINTS
-# -------------------------------------------------
+# ----------------- blueprints -----------------
 
 from blueprints.auth import auth_bp
 from blueprints.admin import admin_bp
@@ -53,17 +41,13 @@ from blueprints.admin import admin_bp
 app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 
-# -------------------------------------------------
-# КОНТЕКСТ ДЛЯ ШАБЛОНОВ
-# -------------------------------------------------
+# ----------------- контекст -----------------
 
 @app.context_processor
 def inject_user():
     return dict(current_user=get_current_user())
 
-# -------------------------------------------------
-# ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ
-# -------------------------------------------------
+# ----------------- БД -----------------
 
 @app.before_first_request
 def init_db():
@@ -79,9 +63,7 @@ def init_db():
         db.session.add(admin)
         db.session.commit()
 
-# -------------------------------------------------
-# ОСНОВНЫЕ СТРАНИЦЫ
-# -------------------------------------------------
+# ----------------- маршруты -----------------
 
 @app.route("/")
 def index():
@@ -103,14 +85,18 @@ def production():
 
 @app.route("/news")
 def news():
-    all_news = News.query.order_by(News.id.desc()).all()
-    return render_template("news.html", news=all_news)
+    return render_template(
+        "news.html",
+        news=News.query.order_by(News.id.desc()).all()
+    )
 
 
 @app.route("/article/<int:article_id>")
 def article(article_id):
-    article = Article.query.get_or_404(article_id)
-    return render_template("article.html", article=article)
+    return render_template(
+        "article.html",
+        article=Article.query.get_or_404(article_id)
+    )
 
 
 @app.route("/contacts", methods=["GET", "POST"])
@@ -127,9 +113,6 @@ def contacts():
 
     return render_template("contacts.html")
 
-# -------------------------------------------------
-# ПОИСК
-# -------------------------------------------------
 
 @app.route("/search")
 def search():
@@ -143,9 +126,6 @@ def search():
         news=results["news"]
     )
 
-# -------------------------------------------------
-# ЛИЧНЫЙ КАБИНЕТ
-# -------------------------------------------------
 
 @app.route("/profile")
 def profile():
@@ -155,25 +135,16 @@ def profile():
         user=get_current_user()
     )
 
-# -------------------------------------------------
-# КАРТА САЙТА
-# -------------------------------------------------
 
 @app.route("/sitemap")
 def sitemap():
     return render_template("sitemap.html")
 
-# -------------------------------------------------
-# СТРАНИЦА 404
-# -------------------------------------------------
 
 @app.errorhandler(404)
-def page_not_found(e):
+def not_found(e):
     return render_template("404.html"), 404
 
-# -------------------------------------------------
-# ЗАПУСК
-# -------------------------------------------------
 
 if __name__ == "__main__":
     app.run(debug=True)

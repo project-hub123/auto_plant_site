@@ -2,7 +2,7 @@
 # Модель новости
 # Проект: "Автомобильный завод"
 
-from app import db
+from extensions import db
 
 
 class News(db.Model):
