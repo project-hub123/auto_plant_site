@@ -5,18 +5,15 @@
 <h2>Регистрация пользователя</h2>
 
 <p>
-Регистрация позволяет создать личную учётную запись на сайте
-автомобильного завода и получить доступ к персональным возможностям.
+Заполните форму для создания новой учётной записи.
 </p>
 
 {% if error %}
-    <p class="error">
-        {{ error }}
-    </p>
+    <p class="error">{{ error }}</p>
 {% endif %}
 
 <div class="card">
-    <form method="post" action="{{ url_for('register') }}">
+    <form method="post" action="{{ url_for('auth.register') }}">
         <label for="username">Логин</label>
         <input
             type="text"
@@ -38,8 +35,8 @@
 </div>
 
 <p>
-Если у вас уже есть учётная запись, вы можете
-<a href="{{ url_for('login') }}">войти в систему</a>.
+Уже есть аккаунт?
+<a href="{{ url_for('auth.login') }}">Войти</a>
 </p>
 
 {% endblock %}
