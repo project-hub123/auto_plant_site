@@ -258,3 +258,45 @@ footer p {
         margin-bottom: 10px;
     }
 }
+
+.banner {
+    background: linear-gradient(
+        rgba(0, 0, 0, 0.65),
+        rgba(0, 0, 0, 0.65)
+    ),
+    url("../imges/banners/banner.jpg") center / cover no-repeat;
+
+    padding: 90px 40px;
+    margin-bottom: 40px;
+    color: #ffffff;
+}
+
+.banner-content {
+    max-width: 750px;
+}
+
+.banner h2 {
+    font-size: 38px;
+    margin-bottom: 20px;
+}
+
+.banner p {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+.banner-button {
+    display: inline-block;
+    padding: 12px 26px;
+    background-color: #ffcc00;
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.banner-button:hover {
+    background-color: #e6b800;
+}
+
