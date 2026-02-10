@@ -1,14 +1,17 @@
-# article.py
-# Модель статьи
+# news.py
+# Модель новости
 # Проект: "Автомобильный завод"
 
 from app import db
 
 
-class Article(db.Model):
-    __tablename__ = "articles"
+class News(db.Model):
+    __tablename__ = "news"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     title = db.Column(
         db.String(200),
@@ -20,10 +23,5 @@ class Article(db.Model):
         nullable=False
     )
 
-    category = db.Column(
-        db.String(50),
-        nullable=False
-    )
-
     def __repr__(self):
-        return f"<Article {self.title}, category={self.category}>"
+        return f"<News {self.title}>"
