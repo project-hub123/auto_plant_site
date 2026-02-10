@@ -2,7 +2,7 @@
 # Корпоративный сайт "Автомобильный завод"
 
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Response
 from werkzeug.security import generate_password_hash
 
 from extensions import db
@@ -53,11 +53,11 @@ def inject_user():
     return dict(current_user=get_current_user())
 
 # -------------------------------------------------
-# ИНИЦИАЛИЗАЦИЯ БД (FLASK 3.x)
+# ИНИЦИАЛИЗАЦИЯ БД
 # -------------------------------------------------
 
 def init_db():
-    os.makedirs("database", exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, "database"), exist_ok=True)
     db.create_all()
 
     if not User.query.filter_by(username="admin").first():
@@ -140,18 +140,32 @@ def search():
 
 
 @app.route("/profile")
+@login_required
 def profile():
-    login_required()
     return render_template(
         "profile.html",
         user=get_current_user()
     )
 
+# -------------------------------------------------
+# КАРТА САЙТА
+# -------------------------------------------------
 
 @app.route("/sitemap")
 def sitemap():
     return render_template("sitemap.html")
 
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    return Response(
+        render_template("sitemap.xml"),
+        mimetype="application/xml"
+    )
+
+# -------------------------------------------------
+# 404
+# -------------------------------------------------
 
 @app.errorhandler(404)
 def not_found(e):
