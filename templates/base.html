@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Автомобильный завод</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link id="theme-style" rel="stylesheet" href="{{ url_for('static', filename='css/style_default.css') }}">
-
     <script src="{{ url_for('static', filename='js/theme_switcher.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/search.js') }}" defer></script>
 </head>
@@ -29,7 +27,6 @@
                 <li><a href="{{ url_for('auth.logout') }}">Выход</a></li>
             {% else %}
                 <li><a href="{{ url_for('auth.login') }}">Вход</a></li>
-                <li><a href="{{ url_for('auth.register') }}">Регистрация</a></li>
             {% endif %}
 
             {% if current_user and current_user.is_admin() %}
@@ -38,13 +35,8 @@
         </ul>
     </nav>
 
-    <form id="search-form" action="{{ url_for('search') }}" method="get" class="search-box">
-        <input
-            id="search-input"
-            type="text"
-            name="q"
-            placeholder="Поиск по сайту"
-        >
+    <form class="search-box" action="{{ url_for('search') }}" method="get">
+        <input type="text" name="q" placeholder="Поиск по сайту">
         <input type="submit" value="Найти">
     </form>
 
@@ -53,13 +45,17 @@
     </button>
 </header>
 
+<!-- БАННЕР  -->
+{% block banner %}{% endblock %}
+
 <main>
-    {% block content %}{% endblock %}
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
 </main>
 
 <footer>
     <p>© 2026 Автомобильный завод</p>
-    <p><a href="{{ url_for('sitemap') }}">Карта сайта</a></p>
 </footer>
 
 </body>

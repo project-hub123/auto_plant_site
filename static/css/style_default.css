@@ -75,13 +75,22 @@ nav a:hover {
 }
 
 /* -------------------------------
+   КОНТЕЙНЕР САЙТА
+-------------------------------- */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* -------------------------------
    ОСНОВНОЙ КОНТЕНТ
 -------------------------------- */
 
 main {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 0 20px;
+    margin: 0;
+    padding: 0;
 }
 
 /* -------------------------------
@@ -239,28 +248,14 @@ footer p {
 }
 
 /* -------------------------------
-   АДАПТИВНОСТЬ
+   БАННЕР (НА ВСЮ ШИРИНУ)
 -------------------------------- */
-
-@media (max-width: 768px) {
-    nav ul {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    main {
-        margin: 20px auto;
-    }
-
-    .search-box input[type="text"],
-    .search-box input[type="submit"] {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-}
 
 .banner {
     position: relative;
+
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
 
     background-image: url("../images/banners/banner.jpg");
     background-size: cover;
@@ -283,11 +278,12 @@ footer p {
     z-index: 1;
 }
 
-/* контент ПОВЕРХ картинки */
+/* контент поверх картинки */
 .banner-content {
     position: relative;
     z-index: 2;
-    max-width: 750px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .banner h2 {
@@ -313,4 +309,33 @@ footer p {
 
 .banner-button:hover {
     background-color: #e6b800;
+}
+
+/* -------------------------------
+   АДАПТИВНОСТЬ
+-------------------------------- */
+
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-box input[type="text"],
+    .search-box input[type="submit"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .banner {
+        padding: 60px 20px;
+    }
+
+    .banner h2 {
+        font-size: 28px;
+    }
+
+    .banner p {
+        font-size: 16px;
+    }
 }
