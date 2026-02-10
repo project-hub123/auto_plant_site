@@ -5,7 +5,11 @@
     <title>Автомобильный завод</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_default.css') }}">
+    <link
+        id="theme-style"
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style_default.css') }}"
+    >
     <script src="{{ url_for('static', filename='js/theme_switcher.js') }}" defer></script>
 </head>
 <body>
@@ -30,7 +34,7 @@
                     <li><a href="{{ url_for('auth.login') }}">Вход</a></li>
                 {% endif %}
 
-                {% if current_user and current_user.is_admin() %}
+                {% if current_user and current_user.role == "admin" %}
                     <li><a href="{{ url_for('admin.admin_panel') }}">Админ-панель</a></li>
                 {% endif %}
             </ul>

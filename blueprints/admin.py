@@ -1,7 +1,3 @@
-# admin.py
-# Административный модуль
-# Проект: "Автомобильный завод"
-
 from flask import (
     Blueprint, render_template,
     request, redirect, url_for,
@@ -18,21 +14,16 @@ from services.access_control import admin_required
 
 
 admin_bp = Blueprint(
-    "admin_bp",
+    "admin",
     __name__,
     url_prefix="/admin"
 )
 
 
-# -------------------------------------------------
-# ГЛАВНАЯ СТРАНИЦА АДМИН-ПАНЕЛИ
-# -------------------------------------------------
-
 @admin_bp.route("/", methods=["GET", "POST"])
+@admin_required
 def admin_panel():
-    admin_required()
 
-    # добавление статьи
     if request.method == "POST" and "article_title" in request.form:
         article = Article(
             title=request.form["article_title"],
@@ -41,9 +32,8 @@ def admin_panel():
         )
         db.session.add(article)
         db.session.commit()
-        return redirect(url_for("admin_bp.admin_panel"))
+        return redirect(url_for("admin.admin_panel"))
 
-    # добавление новости
     if request.method == "POST" and "news_title" in request.form:
         news = News(
             title=request.form["news_title"],
@@ -51,30 +41,24 @@ def admin_panel():
         )
         db.session.add(news)
         db.session.commit()
-        return redirect(url_for("admin_bp.admin_panel"))
+        return redirect(url_for("admin.admin_panel"))
 
     return render_template(
         "admin.html",
-        articles=Article.query.all(),
-        news=News.query.all(),
         users=User.query.all()
     )
 
 
-# -------------------------------------------------
-# СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ
-# -------------------------------------------------
-
 @admin_bp.route("/create_user", methods=["POST"])
+@admin_required
 def create_user():
-    admin_required()
 
     username = request.form["username"]
     password = request.form["password"]
     role = request.form["role"]
 
     if User.query.filter_by(username=username).first():
-        return redirect(url_for("admin_bp.admin_panel"))
+        return redirect(url_for("admin.admin_panel"))
 
     user = User(
         username=username,
@@ -84,22 +68,17 @@ def create_user():
     db.session.add(user)
     db.session.commit()
 
-    return redirect(url_for("admin_bp.admin_panel"))
+    return redirect(url_for("admin.admin_panel"))
 
-
-# -------------------------------------------------
-# УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ
-# -------------------------------------------------
 
 @admin_bp.route("/delete_user/<int:user_id>")
+@admin_required
 def delete_user(user_id):
-    admin_required()
 
     user = User.query.get_or_404(user_id)
 
-    # запрещаем удалять главного администратора
     if user.username != "admin":
         db.session.delete(user)
         db.session.commit()
 
-    return redirect(url_for("admin_bp.admin_panel"))
+    return redirect(url_for("admin.admin_panel"))
