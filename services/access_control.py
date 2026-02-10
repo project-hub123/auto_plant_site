@@ -1,8 +1,9 @@
-# access_control.py
+# services/access_control.py
 # Сервис контроля доступа и ролей пользователей
 # Проект: "Автомобильный завод"
 
-from flask import session, abort
+from functools import wraps
+from flask import session, abort, redirect, url_for
 from models.user import User
 
 
@@ -18,20 +19,28 @@ def get_current_user():
     return User.query.get(user_id)
 
 
-def login_required():
+def login_required(func):
     """
-    Проверка авторизации пользователя.
-    Если пользователь не вошёл в систему — ошибка 403.
+    Декоратор проверки авторизации пользователя.
+    Если пользователь не вошёл в систему — редирект на страницу входа.
     """
-    if not session.get("user_id"):
-        abort(403)
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not session.get("user_id"):
+            return redirect(url_for("auth.login"))
+        return func(*args, **kwargs)
+    return wrapper
 
 
-def admin_required():
+def admin_required(func):
     """
-    Проверка прав администратора.
+    Декоратор проверки прав администратора.
     Если пользователь не администратор — ошибка 403.
     """
-    user = get_current_user()
-    if not user or not user.is_admin():
-        abort(403)
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+        if not user or not user.is_admin():
+            abort(403)
+        return func(*args, **kwargs)
+    return wrapper
