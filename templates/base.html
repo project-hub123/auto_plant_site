@@ -21,6 +21,8 @@
                 <li><a href="{{ url_for('production') }}">Производство</a></li>
                 <li><a href="{{ url_for('news') }}">Новости</a></li>
                 <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
+                <a href="{{ url_for('sitemap') }}">Карта сайта</a>
+
 
                 {% if current_user %}
                     <li><a href="{{ url_for('profile') }}">Личный кабинет</a></li>
