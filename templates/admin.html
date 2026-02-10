@@ -4,139 +4,81 @@
 
 <h2>Административная панель</h2>
 
-<p>
-Административная панель предназначена для управления контентом сайта
-автомобильного завода, а также для контроля учётных записей пользователей.
-Доступ к данному разделу имеют только пользователи с ролью администратора.
-</p>
+<!-- ===================== -->
+<!-- ДОБАВЛЕНИЕ СТАТЬИ -->
+<!-- ===================== -->
 
-<!-- ===============================
-     ДОБАВЛЕНИЕ СТАТЕЙ
-================================ -->
+<div class="card">
+    <h3>Добавить статью</h3>
 
-<div class="admin-panel">
-    <h3>Добавление статьи</h3>
-
-    <p>
-        В данном разделе администратор может добавить новую статью
-        в один из основных разделов сайта.
-    </p>
-
-    <form method="post" action="{{ url_for('admin') }}">
-        <label for="article_title">Заголовок статьи</label>
-        <input
-            type="text"
-            id="article_title"
-            name="article_title"
-            required
-        >
-
-        <label for="category">Раздел</label>
-        <input
-            type="text"
-            id="category"
-            name="category"
-            placeholder="about или production"
-            required
-        >
-
-        <label for="article_content">Текст статьи</label>
-        <textarea
-            id="article_content"
-            name="article_content"
-            required
-        ></textarea>
-
+    <form method="post">
+        <input type="text" name="article_title" placeholder="Заголовок" required>
+        <input type="text" name="category" placeholder="Категория (about / production)" required>
+        <textarea name="article_content" placeholder="Текст статьи" required></textarea>
         <input type="submit" value="Добавить статью">
     </form>
 </div>
 
-<!-- ===============================
-     ДОБАВЛЕНИЕ НОВОСТЕЙ
-================================ -->
+<!-- ===================== -->
+<!-- ДОБАВЛЕНИЕ НОВОСТИ -->
+<!-- ===================== -->
 
-<div class="admin-panel">
-    <h3>Добавление новости</h3>
+<div class="card">
+    <h3>Добавить новость</h3>
 
-    <p>
-        Раздел позволяет публиковать новости о деятельности завода,
-        обновлениях производства и других значимых событиях.
-    </p>
-
-    <form method="post" action="{{ url_for('admin') }}">
-        <label for="news_title">Заголовок новости</label>
-        <input
-            type="text"
-            id="news_title"
-            name="news_title"
-            required
-        >
-
-        <label for="news_content">Текст новости</label>
-        <textarea
-            id="news_content"
-            name="news_content"
-            required
-        ></textarea>
-
+    <form method="post">
+        <input type="text" name="news_title" placeholder="Заголовок" required>
+        <textarea name="news_content" placeholder="Текст новости" required></textarea>
         <input type="submit" value="Добавить новость">
     </form>
 </div>
 
-<!-- ===============================
-     СПИСОК СТАТЕЙ
-================================ -->
+<!-- ===================== -->
+<!-- ПОЛЬЗОВАТЕЛИ -->
+<!-- ===================== -->
 
-<div class="admin-panel">
-    <h3>Список статей</h3>
-
-    {% if articles %}
-        {% for article in articles %}
-            <p>
-                {{ article.title }}  
-                (раздел: {{ article.category }})
-            </p>
-        {% endfor %}
-    {% else %}
-        <p>Статьи отсутствуют.</p>
-    {% endif %}
-</div>
-
-<!-- ===============================
-     СПИСОК НОВОСТЕЙ
-================================ -->
-
-<div class="admin-panel">
-    <h3>Список новостей</h3>
-
-    {% if news %}
-        {% for item in news %}
-            <p>
-                {{ item.title }}
-            </p>
-        {% endfor %}
-    {% else %}
-        <p>Новости отсутствуют.</p>
-    {% endif %}
-</div>
-
-<!-- ===============================
-     ПОЛЬЗОВАТЕЛИ
-================================ -->
-
-<div class="admin-panel">
+<div class="card">
     <h3>Пользователи сайта</h3>
 
-    {% if users %}
-        {% for user in users %}
-            <p>
-                Логин: {{ user.username }} |
-                Роль: {{ user.role }}
-            </p>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Логин</th>
+            <th>Роль</th>
+            <th>Действия</th>
+        </tr>
+
+        {% for u in users %}
+        <tr>
+            <td>{{ u.username }}</td>
+            <td>{{ u.role }}</td>
+            <td>
+                {% if u.username != "admin" %}
+                <a href="{{ url_for('admin_bp.delete_user', user_id=u.id) }}">
+                    Удалить
+                </a>
+                {% endif %}
+            </td>
+        </tr>
         {% endfor %}
-    {% else %}
-        <p>Пользователи отсутствуют.</p>
-    {% endif %}
+    </table>
+</div>
+
+<!-- ===================== -->
+<!-- СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ -->
+<!-- ===================== -->
+
+<div class="card">
+    <h3>Создать пользователя</h3>
+
+    <form method="post" action="{{ url_for('admin_bp.create_user') }}">
+        <input type="text" name="username" placeholder="Логин" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <select name="role">
+            <option value="user">Пользователь</option>
+            <option value="admin">Администратор</option>
+        </select>
+        <input type="submit" value="Создать пользователя">
+    </form>
 </div>
 
 {% endblock %}
