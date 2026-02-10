@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>О заводе</h2>
+
+<p>
+В данном разделе представлена информация об истории автомобильного завода,
+основных направлениях деятельности, ценностях компании и подходах к развитию
+производства.
+</p>
+
+{% if articles %}
+    {% for article in articles %}
+        <div class="card">
+            <h3>{{ article.title }}</h3>
+            <p>
+                {{ article.content[:400] }}
+                {% if article.content|length > 400 %}...{% endif %}
+            </p>
+            <a href="{{ url_for('article', article_id=article.id) }}">
+                Читать полностью
+            </a>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>
+        Информация о заводе в данный момент находится в процессе наполнения.
+        Материалы будут добавлены позже.
+    </p>
+{% endif %}
+
+{% endblock %}
