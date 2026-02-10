@@ -4,68 +4,72 @@
 # Стек: Python + Flask
 
 import os
-from flask import (
-    Flask, render_template, request,
-    redirect, url_for, session, abort
-)
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
 # -------------------------------------------------
-# НАСТРОЙКИ ПРИЛОЖЕНИЯ
+# ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
 # -------------------------------------------------
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "auto_plant_secret_key"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, "database", "db.sqlite3")
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    "sqlite:///" + os.path.join(BASE_DIR, "database", "db.sqlite3")
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
 # -------------------------------------------------
-# МОДЕЛИ БАЗЫ ДАННЫХ
+# ИМПОРТ МОДЕЛЕЙ
 # -------------------------------------------------
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(20), nullable=False)
+from models.user import User
+from models.article import Article
+from models.news import News
+from models.message import Message
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+# -------------------------------------------------
+# ИМПОРТ СЕРВИСОВ
+# -------------------------------------------------
 
+from services.search import search_content
+from services.access_control import (
+    get_current_user,
+    login_required,
+    admin_required
+)
 
-class Article(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    category = db.Column(db.String(50), nullable=False)
+# -------------------------------------------------
+# ИМПОРТ BLUEPRINTS
+# -------------------------------------------------
 
+from blueprints.auth import auth_bp
+from blueprints.admin import admin_bp
 
-class News(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    content = db.Column(db.Text, nullable=False)
+app.register_blueprint(auth_bp)
+app.register_blueprint(admin_bp)
 
+# -------------------------------------------------
+# КОНТЕКСТ ДЛЯ ШАБЛОНОВ
+# -------------------------------------------------
 
-class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    sender = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    text = db.Column(db.Text, nullable=False)
+@app.context_processor
+def inject_user():
+    return dict(current_user=get_current_user())
 
 # -------------------------------------------------
 # ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ
 # -------------------------------------------------
 
 @app.before_first_request
-def create_tables():
+def init_db():
+    os.makedirs("database", exist_ok=True)
     db.create_all()
 
-    # создаём администратора, если его нет
     if not User.query.filter_by(username="admin").first():
         admin = User(
             username="admin",
@@ -74,26 +78,6 @@ def create_tables():
         )
         db.session.add(admin)
         db.session.commit()
-
-# -------------------------------------------------
-# ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-# -------------------------------------------------
-
-def current_user():
-    if "user_id" in session:
-        return User.query.get(session["user_id"])
-    return None
-
-
-def login_required():
-    if "user_id" not in session:
-        return False
-    return True
-
-
-def admin_required():
-    user = current_user()
-    return user and user.role == "admin"
 
 # -------------------------------------------------
 # ОСНОВНЫЕ СТРАНИЦЫ
@@ -125,8 +109,8 @@ def news():
 
 @app.route("/article/<int:article_id>")
 def article(article_id):
-    art = Article.query.get_or_404(article_id)
-    return render_template("article.html", article=art)
+    article = Article.query.get_or_404(article_id)
+    return render_template("article.html", article=article)
 
 
 @app.route("/contacts", methods=["GET", "POST"])
@@ -144,69 +128,20 @@ def contacts():
     return render_template("contacts.html")
 
 # -------------------------------------------------
-# ПОИСК ПО САЙТУ
+# ПОИСК
 # -------------------------------------------------
 
 @app.route("/search")
 def search():
-    query = request.args.get("q", "").strip()
-    articles = []
-    news = []
-
-    if query:
-        articles = Article.query.filter(Article.title.contains(query)).all()
-        news = News.query.filter(News.title.contains(query)).all()
+    query = request.args.get("q", "")
+    results = search_content(query)
 
     return render_template(
         "search.html",
         query=query,
-        articles=articles,
-        news=news
+        articles=results["articles"],
+        news=results["news"]
     )
-
-# -------------------------------------------------
-# АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ
-# -------------------------------------------------
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    error = None
-
-    if request.method == "POST":
-        user = User.query.filter_by(username=request.form["username"]).first()
-        if user and user.check_password(request.form["password"]):
-            session["user_id"] = user.id
-            return redirect(url_for("profile"))
-        else:
-            error = "Неверный логин или пароль"
-
-    return render_template("login.html", error=error)
-
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    error = None
-
-    if request.method == "POST":
-        if User.query.filter_by(username=request.form["username"]).first():
-            error = "Пользователь уже существует"
-        else:
-            user = User(
-                username=request.form["username"],
-                password_hash=generate_password_hash(request.form["password"]),
-                role="user"
-            )
-            db.session.add(user)
-            db.session.commit()
-            return redirect(url_for("login"))
-
-    return render_template("register.html", error=error)
-
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("index"))
 
 # -------------------------------------------------
 # ЛИЧНЫЙ КАБИНЕТ
@@ -214,49 +149,10 @@ def logout():
 
 @app.route("/profile")
 def profile():
-    if not login_required():
-        return redirect(url_for("login"))
-
-    user = current_user()
-    return render_template("profile.html", user=user)
-
-# -------------------------------------------------
-# АДМИН-ПАНЕЛЬ
-# -------------------------------------------------
-
-@app.route("/admin", methods=["GET", "POST"])
-def admin():
-    if not admin_required():
-        abort(403)
-
-    if request.method == "POST":
-        if "article_title" in request.form:
-            article = Article(
-                title=request.form["article_title"],
-                content=request.form["article_content"],
-                category=request.form["category"]
-            )
-            db.session.add(article)
-
-        if "news_title" in request.form:
-            news = News(
-                title=request.form["news_title"],
-                content=request.form["news_content"]
-            )
-            db.session.add(news)
-
-        db.session.commit()
-        return redirect(url_for("admin"))
-
-    articles = Article.query.all()
-    news = News.query.all()
-    users = User.query.all()
-
+    login_required()
     return render_template(
-        "admin.html",
-        articles=articles,
-        news=news,
-        users=users
+        "profile.html",
+        user=get_current_user()
     )
 
 # -------------------------------------------------
@@ -276,9 +172,8 @@ def page_not_found(e):
     return render_template("404.html"), 404
 
 # -------------------------------------------------
-# ЗАПУСК ПРИЛОЖЕНИЯ
+# ЗАПУСК
 # -------------------------------------------------
 
 if __name__ == "__main__":
-    os.makedirs("database", exist_ok=True)
     app.run(debug=True)
