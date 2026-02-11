@@ -2,6 +2,7 @@
 # Сервис поиска по сайту
 # Проект: "Автомобильный завод"
 
+from sqlalchemy import or_
 from models.article import Article
 from models.news import News
 
@@ -9,32 +10,37 @@ from models.news import News
 def search_content(query: str):
     """
     Выполняет поиск по статьям и новостям сайта.
-
-    :param query: поисковый запрос
-    :return: словарь с результатами поиска
+    Возвращает словарь с результатами.
     """
 
-    if not query or len(query.strip()) < 2:
-        return {
-            "articles": [],
-            "news": []
-        }
+    if not query:
+        return {"articles": [], "news": []}
 
     query = query.strip()
 
-    # Поиск по заголовкам и тексту статей
-    articles = Article.query.filter(
-        (Article.title.ilike(f"%{query}%")) |
-        (Article.content.ilike(f"%{query}%"))
-    ).all()
+    if len(query) < 2:
+        return {"articles": [], "news": []}
 
-    # Поиск по заголовкам и тексту новостей
-    news = News.query.filter(
-        (News.title.ilike(f"%{query}%")) |
-        (News.content.ilike(f"%{query}%"))
-    ).all()
+    try:
+        articles = Article.query.filter(
+            or_(
+                Article.title.ilike(f"%{query}%"),
+                Article.content.ilike(f"%{query}%")
+            )
+        ).all()
+
+        news = News.query.filter(
+            or_(
+                News.title.ilike(f"%{query}%"),
+                News.content.ilike(f"%{query}%")
+            )
+        ).all()
+
+    except Exception:
+        # если вдруг что-то в базе не так — не роняем сайт
+        return {"articles": [], "news": []}
 
     return {
-        "articles": articles,
-        "news": news
+        "articles": articles or [],
+        "news": news or []
     }
