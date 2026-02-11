@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Поиск по сайту</h2>
+
+<form method="get" action="{{ url_for('search') }}">
+    <input type="text" name="q" value="{{ query or '' }}" placeholder="Введите запрос" required>
+    <button type="submit">Найти</button>
+</form>
+
+{% if query %}
+    <h3>Результаты поиска по запросу: "{{ query }}"</h3>
+
+    {% if articles or news %}
+        
+        {% if articles %}
+        <div class="card">
+            <h4>Статьи</h4>
+            <ul>
+                {% for article in articles %}
+                    <li>
+                        <a href="{{ url_for('article', article_id=article.id) }}">
+                            {{ article.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if news %}
+        <div class="card">
+            <h4>Новости</h4>
+            <ul>
+                {% for item in news %}
+                    <li>{{ item.title }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <p>По вашему запросу ничего не найдено.</p>
+    {% endif %}
+{% endif %}
+
+{% endblock %}
