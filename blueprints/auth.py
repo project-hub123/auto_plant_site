@@ -1,7 +1,3 @@
-# auth.py
-# Модуль авторизации и регистрации пользователей
-# Проект: "Автомобильный завод"
-
 from flask import (
     Blueprint, render_template,
     request, redirect, url_for,
@@ -43,7 +39,9 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        if User.query.filter_by(username=username).first():
+        if not username or not password:
+            error = "Заполните все поля"
+        elif User.query.filter_by(username=username).first():
             error = "Пользователь с таким логином уже существует"
         else:
             user = User(

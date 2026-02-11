@@ -11,7 +11,7 @@
     </p>
 </div>
 
-{% if user.is_admin() %}
+{% if user.role == "admin" %}
 <div class="card">
     <h3>Панель администратора</h3>
 
@@ -20,7 +20,7 @@
         Вы можете управлять пользователями, статьями и новостями сайта.
     </p>
 
-    <a href="{{ url_for('admin_bp.admin_panel') }}">
+    <a href="{{ url_for('admin.admin_panel') }}">
         Перейти в админ-панель
     </a>
 </div>
